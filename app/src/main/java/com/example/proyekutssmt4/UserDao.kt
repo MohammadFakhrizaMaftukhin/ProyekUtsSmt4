@@ -1,9 +1,12 @@
 package com.example.proyekutssmt4
 
+import androidx.lifecycle.LiveData
+import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 
+@Dao
 interface UserDao {
     @Insert
     suspend fun insert(user: User)
@@ -12,7 +15,7 @@ interface UserDao {
     suspend fun login(email: String, password: String): User?
 
     @Query("SELECT * FROM users WHERE email = :email")
-    suspend fun getUserByEmail(email: String): User?
+    fun observeUserByEmail(email: String): LiveData<User>
 
     @Update
     suspend fun update(user: User)
