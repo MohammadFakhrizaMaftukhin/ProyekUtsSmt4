@@ -1,20 +1,43 @@
 package com.example.proyekutssmt4
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.databinding.DataBindingUtil
+import com.example.proyekutssmt4.databinding.ActivityLoginBinding
 
 class LoginActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityLoginBinding
+    private val viewModel: UserViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_login)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_login)
+        binding.lifecycleOwner = this
+        binding.userViewModel = viewModel
+
+        binding.btnLogin.setOnClickListener {
+            val email = binding.edtEmail.text.toString()
+            val password = binding.edtPassword.text.toString()
+            viewModel.login(email, password)
+        }
+
+        binding.btnRegisterPage.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+
+        viewModel.currentUser.observe(this) { user ->
+            if (user != null) {
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("email", user.email)
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this, "Login gagal", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 }
